@@ -1,0 +1,32 @@
+
+{
+  // Launch configurations for this Next.js app
+  // - "Start Next (dev)": runs `npm run dev` in an integrated terminal (use once to start server)
+  // - "Open in Chrome (no restart)": launches Chrome to http://localhost:3000 without starting/stopping the server
+  // Workflow: Run `npm run dev` in a terminal (or use Start Next once). For daily use, select
+  // "Open in Chrome (no restart)" and press F5 — the debug session will NOT restart the dev server.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Start Next (dev)",
+      "type": "pwa-node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 9229,
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    {
+      "name": "Open in Chrome (no restart)",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome",
+      "breakOnLoad": false
+    }
+  ]
+}
