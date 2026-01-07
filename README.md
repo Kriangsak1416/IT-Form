@@ -20,24 +20,6 @@ A Next.js dashboard application for hospital computer center forms, built with T
 - Node.js 18.x or later
 - npm or yarn
 
-### Installation
-
-1. Clone the repository:
-```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Run the development server:
-```bash
-npm run dev
-```
-
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ### Docker Development
