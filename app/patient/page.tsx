@@ -8,15 +8,19 @@ export default function PatientPage() {
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
   const [idCard, setIdCard] = useState("");
+  const [registrationStatus, setRegistrationStatus] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const payload = { type: "patient", name, dob, idCard };
+    const payload = { type: "patient", name, dob, idCard, registrationStatus, acceptTerms };
     console.log("Submit", payload);
     alert("ส่งข้อมูลผู้ป่วยเรียบร้อย");
     setName("");
     setDob("");
     setIdCard("");
+    setRegistrationStatus("");
+    setAcceptTerms(false);
   }
 
   return (
@@ -87,6 +91,17 @@ export default function PatientPage() {
               </div>
 
               <div className="space-y-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300"> ตำแหน่งงาน 
+                  <span className="text-red-500">*</span> </label>
+                <input
+                  // value={position}
+                  // onChange={(e) => setPosition(e.target.value)}
+                  placeholder="กรุณากรอกตำแหน่งงาน"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                   วันเกิด <span className="text-red-500">*</span>
                 </label>
@@ -112,8 +127,75 @@ export default function PatientPage() {
                   required
                 />
               </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  เลขที่วิชาชีพ
+                </label>
+                <input
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  วันที่เริ่มเข้าทำงาน <span className="text-red-500">*</span>
+                </label>
+                <input
+                  // value={dob}
+                  // onChange={(e) => setDob(e.target.value)}
+                  type="date"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                />
+              </div>
+
             </div>
 
+            <div className="space-y-2">
+              <fieldset className="space-y-2">
+                <legend className="text-sm font-medium text-slate-700 dark:text-slate-300">สถานะการลงทะเบียน</legend>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="registrationStatus"
+                      value="registered"
+                      checked={registrationStatus === "registered"}
+                      onChange={(e) => setRegistrationStatus(e.target.value)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300"
+                    />
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">เคยลงทะเบียนแล้ว</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="registrationStatus"
+                      value="not-registered"
+                      checked={registrationStatus === "not-registered"}
+                      onChange={(e) => setRegistrationStatus(e.target.value)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300"
+                    />
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">ยังไม่เคยลงทะเบียน</span>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={acceptTerms}
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded"
+                />
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  ยอมรับ{" "}
+                  <Link href="/terms" target="_blank" className="text-blue-600 hover:text-blue-700 underline">
+                    เงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัว <span className="text-red-500">*</span>
+                  </Link>
+                </span>
+              </label>
+            </div>
             <div className="flex gap-4 pt-4">
               <button
                 type="submit"
@@ -123,7 +205,7 @@ export default function PatientPage() {
               </button>
               <button
                 type="button"
-                onClick={() => { setName(""); setDob(""); setIdCard(""); }}
+                onClick={() => { setName(""); setDob(""); setIdCard(""); setRegistrationStatus(""); setAcceptTerms(false); }}
                 className="px-6 py-3 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
               >
                 ล้างข้อมูล
