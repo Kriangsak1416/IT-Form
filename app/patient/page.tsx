@@ -94,7 +94,6 @@ export default function PatientPage() {
                   // onChange={(e) => setPosition(e.target.value)}
                   placeholder="กรุณากรอกตำแหน่งงาน"
                   className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  required
                 />
               </div>
 
@@ -124,6 +123,16 @@ export default function PatientPage() {
                   required
                 />
               </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  เลขที่วิชาชีพ
+                </label>
+                <input
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                />
+              </div>
+
             </div>
 
             <div className="flex gap-4 pt-4">
