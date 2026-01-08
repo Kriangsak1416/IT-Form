@@ -1085,6 +1085,10 @@
     max-width: var(--container-6xl);
   }
 
+  .max-w-none {
+    max-width: none;
+  }
+
   .flex-1 {
     flex: 1;
   }
@@ -1107,6 +1111,10 @@
 
   .justify-center {
     justify-content: center;
+  }
+
+  .gap-2 {
+    gap: calc(var(--spacing) * 2);
   }
 
   .gap-3 {
@@ -1141,6 +1149,10 @@
 
   .overflow-hidden {
     overflow: hidden;
+  }
+
+  .rounded {
+    border-radius: .25rem;
   }
 
   .rounded-lg {
@@ -1435,6 +1447,10 @@
 
   .text-white {
     color: var(--color-white);
+  }
+
+  .underline {
+    text-decoration-line: underline;
   }
 
   .antialiased {
