@@ -1,13 +1,22 @@
+version: '3.8'
+
 services:
-  dashboard-dev:
+  phos_app:
     build:
       context: .
       dockerfile: Dockerfile.dev
+    container_name: phos_app
     ports:
       - "3000:3000"
     volumes:
       - .:/app
       - /app/node_modules
     environment:
-      NODE_ENV: development
-      CHOKIDAR_USEPOLLING: "true"
+      - CHOKIDAR_USEPOLLING=true
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root1511
+      - DB_NAME=phos_db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
