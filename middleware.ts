@@ -1,23 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get('auth_token')?.value;
-  const { pathname } = request.nextUrl;
-
-  // Allow login page and API routes without authentication
-  if (pathname === '/login' || pathname.startsWith('/api/auth/')) {
-    return NextResponse.next();
-  }
-
-  // Check if user is authenticated
-  if (!token || !verifyToken(token)) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
-
+  // ปล่อยให้ทุกหน้าเข้าได้โดยไม่ต้อง login
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 };

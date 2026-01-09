@@ -1,44 +1,22 @@
 version: '3.8'
 
 services:
-  mariadb:
-    image: mariadb:latest
-    container_name: phos_db
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: root1511
-      MYSQL_DATABASE: phos_db
-    ports:
-      - "3306:3306"
-    volumes:
-      - mariadb_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost"]
-      timeout: 20s
-      retries: 10
-
-  app:
+  phos_app:
     build:
       context: .
       dockerfile: Dockerfile.dev
     container_name: phos_app
-    restart: unless-stopped
     ports:
       - "3000:3000"
-    environment:
-      DB_HOST: mariadb
-      DB_PORT: 3306
-      DB_USER: root
-      DB_PASSWORD: root1511
-      DB_NAME: phos_db
-      JWT_SECRET: your_jwt_secret_key_here_change_this_in_production
-      CHOKIDAR_USEPOLLING: "true"
     volumes:
       - .:/app
       - /app/node_modules
-    depends_on:
-      mariadb:
-        condition: service_healthy
-
-volumes:
-  mariadb_data:
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root1511
+      - DB_NAME=phos_db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

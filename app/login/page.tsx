@@ -32,7 +32,11 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      // บันทึก user ลง localStorage
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Redirect กลับหน้าแรก
+      router.push("/");
     } catch (err) {
       setError("An error occurred. Please try again.");
       console.error(err);

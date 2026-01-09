@@ -1,10 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+interface User {
+  id: string;
+  username: string;
+  firstname: string;
+  lastname: string;
+  position?: string;
+}
+
 export default function Home() {
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    // ตรวจสอบว่ามี user ใน localStorage หรือไม่
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -23,16 +46,35 @@ export default function Home() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">แบบฟอร์มศูนย์คอมพิวเตอร์ โรงพยาบาลแพร่</h1>
-                <p className="text-sm text-slate-600 dark:text-slate-400">แบบฟอร์มศูนย์คอมพิวเตอร์</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">แบบฟอร์มออนไลน์ศูนย์คอมพิวเตอร์</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Link
-                href="/login"
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                เข้าสู่ระบบ
-              </Link>
+              {user ? (
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                      {user.firstname} {user.lastname}
+                    </p>
+                    {user.position && (
+                      <p className="text-xs text-slate-600 dark:text-slate-400">{user.position}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  >
+                    ออกจากระบบ
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                  เข้าสู่ระบบ
+                </Link>
+              )}
             </div>
           </div>
         </header>
