@@ -1,12 +1,19 @@
 FROM node:20-alpine
+
 WORKDIR /app
 
-ENV NODE_ENV=development
-ENV NEXT_TELEMETRY_DISABLED=1
-
+# Install dependencies
 COPY package*.json ./
+RUN npm install --save-dev @types/react @types/react-dom @types/node
 RUN npm install
 
+# Copy project
 COPY . .
+
+# Set environment variables
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV CHOKIDAR_USEPOLLING=true
+
 EXPOSE 3000
+
 CMD ["npm", "run", "dev"]

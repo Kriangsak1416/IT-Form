@@ -1,15 +1,36 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+interface User {
+  id: string;
+  username: string;
+  firstname: string;
+  lastname: string;
+  position?: string;
+}
+
 export default function PatientPage() {
+  const [user, setUser] = useState<User | null>(null);
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
   const [idCard, setIdCard] = useState("");
   const [registrationStatus, setRegistrationStatus] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+  };
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -25,12 +46,12 @@ export default function PatientPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
         <header className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 mb-8">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <Link href="/" className="h-16 w-16 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow cursor-pointer">
+              <Link href="/" className="h-16 w-16 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow cursor-pointer flex-shrink-0">
                 <Image
                   src="/logo.jpg"
                   alt="โรงพยาบาลแพร่"
@@ -40,23 +61,52 @@ export default function PatientPage() {
                 />
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">แบบฟอร์มศูนย์คอมพิวเตอร์ โรงพยาบาลแพร่</h1>
-                <p className="text-sm text-slate-600 dark:text-slate-400">แบบฟอร์มศูนย์คอมพิวเตอร์</p>
+                <h1 className="text-xl lg:text-2xl font-bold text-slate-900 dark:text-slate-100">แบบฟอร์มศูนย์คอมพิวเตอร์ โรงพยาบาลแพร่</h1>
+                <p className="text-sm text-slate-600 dark:text-slate-400">ใบลงทะเบียนผู้ใช้งานระบบโปรแกรมคอมพิวเตอร์</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Link
-                href="/login"
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                เข้าสู่ระบบ
-              </Link>
-              <Link
-                href="/"
-                className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-              >
-                ← กลับหน้าหลัก
-              </Link>
+            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+              {user ? (
+                <>
+                  <div className="flex items-center gap-3 flex-1 lg:flex-initial">
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                        {user.firstname} {user.lastname}
+                      </p>
+                      {user.position && (
+                        <p className="text-xs text-slate-600 dark:text-slate-400">{user.position}</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 whitespace-nowrap"
+                    >
+                      ออกจากระบบ
+                    </button>
+                  </div>
+                  <Link
+                    href="/"
+                    className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors whitespace-nowrap"
+                  >
+                    ← กลับหน้าหลัก
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 whitespace-nowrap"
+                  >
+                    เข้าสู่ระบบ
+                  </Link>
+                  <Link
+                    href="/"
+                    className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors whitespace-nowrap"
+                  >
+                    ← กลับหน้าหลัก
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </header>
