@@ -201,7 +201,7 @@ export default function PatientPage() {
                 type="submit"
                 className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
-                ส่งข้อมูล
+                บันทึกข้อมูล
               </button>
               <button
                 type="button"
