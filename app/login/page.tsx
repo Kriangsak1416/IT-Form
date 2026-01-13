@@ -6,7 +6,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/lib/hooks/useToast";
-import { ToastContainer } from "@/components/Toast";
 import md5 from "md5";
 
 export default function LoginPage() {
@@ -15,7 +14,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { toasts, addToast, removeToast } = useToast();
+  const { addToast } = useToast();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -59,7 +58,6 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
         {/* Header */}
         <div className="mb-6 text-center">
