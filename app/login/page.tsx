@@ -42,9 +42,9 @@ export default function LoginPage() {
       localStorage.setItem("user", JSON.stringify(data.user));
       addToast("เข้าสู่ระบบสำเร็จ", "success");
 
-      // Redirect กลับหน้าแรก
+      // Redirect กลับหน้าแรกและรีเฟรช
       setTimeout(() => {
-        router.push("/");
+        window.location.href = "/";
       }, 1500);
     } catch (err) {
       const errorMsg = "An error occurred. Please try again.";

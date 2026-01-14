@@ -1,36 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-interface User {
-  id: string;
-  username: string;
-  firstname: string;
-  lastname: string;
-  position?: string;
-}
-
 export default function PatientPage() {
-  const [user, setUser] = useState<User | null>(null);
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
   const [idCard, setIdCard] = useState("");
   const [registrationStatus, setRegistrationStatus] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
-
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
-  };
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -66,47 +45,12 @@ export default function PatientPage() {
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-              {user ? (
-                <>
-                  <div className="flex items-center gap-3 flex-1 lg:flex-initial">
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                        {user.firstname} {user.lastname}
-                      </p>
-                      {user.position && (
-                        <p className="text-xs text-slate-600 dark:text-slate-400">{user.position}</p>
-                      )}
-                    </div>
-                    <button
-                      onClick={handleLogout}
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 whitespace-nowrap"
-                    >
-                      ออกจากระบบ
-                    </button>
-                  </div>
-                  <Link
-                    href="/"
-                    className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors whitespace-nowrap"
-                  >
-                    ← กลับหน้าหลัก
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 whitespace-nowrap"
-                  >
-                    เข้าสู่ระบบ
-                  </Link>
-                  <Link
-                    href="/"
-                    className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors whitespace-nowrap"
-                  >
-                    ← กลับหน้าหลัก
-                  </Link>
-                </>
-              )}
+              <Link
+                href="/"
+                className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors whitespace-nowrap"
+              >
+                ← กลับหน้าหลัก
+              </Link>
             </div>
           </div>
         </header>
@@ -127,6 +71,20 @@ export default function PatientPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2 md:col-span-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  เลขบัตรประชาชน <span className="text-red-500">*</span>
+                </label>
+                <input
+                  value={idCard}
+                  onChange={(e) => setIdCard(e.target.value)}
+                  placeholder="กรุณากรอกเลขบัตรประชาชน 13 หลัก"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  maxLength={13}
+                  required
+                />
+              </div>
+
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                   ชื่อ-นามสกุล <span className="text-red-500">*</span>
@@ -160,20 +118,6 @@ export default function PatientPage() {
                   onChange={(e) => setDob(e.target.value)}
                   type="date"
                   className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2 md:col-span-2">
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  เลขบัตรประชาชน <span className="text-red-500">*</span>
-                </label>
-                <input
-                  value={idCard}
-                  onChange={(e) => setIdCard(e.target.value)}
-                  placeholder="กรุณากรอกเลขบัตรประชาชน 13 หลัก"
-                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                  maxLength={13}
                   required
                 />
               </div>
