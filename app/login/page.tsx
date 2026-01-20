@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/lib/hooks/useToast";
+import md5 from "md5";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -12,6 +14,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { addToast } = useToast();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -19,26 +22,34 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      const hashedPassword = md5(password);
+
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password: hashedPassword }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
         setError(data.error || "Login failed");
+        addToast(data.error || "Login failed", "error");
         return;
       }
 
       // บันทึก user ลง localStorage
       localStorage.setItem("user", JSON.stringify(data.user));
+      addToast("เข้าสู่ระบบสำเร็จ", "success");
 
-      // Redirect กลับหน้าแรก
-      router.push("/");
+      // Redirect กลับหน้าแรกและรีเฟรช
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1500);
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      const errorMsg = "An error occurred. Please try again.";
+      setError(errorMsg);
+      addToast(errorMsg, "error");
       console.error(err);
     } finally {
       setLoading(false);
