@@ -5,17 +5,18 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function StaffPage() {
-  const [name, setName] = useState("");
-  const [role, setRole] = useState("");
-  const [ext, setExt] = useState("");
-  const [department, setDepartment] = useState("");
+  const [hn, setHn] = useState("");
+  const [incompleteLab, setIncompleteLab] = useState("");
+  const [workUnit, setWorkUnit] = useState("");
+  const [appointmentIssueDate, setAppointmentIssueDate] = useState("");
+  const [appointmentDate, setAppointmentDate] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const payload = { type: "staff", name, role, ext, department };
+    const payload = { type: "staff", hn, incompleteLab, workUnit, appointmentIssueDate, appointmentDate };
     console.log("Submit", payload);
     alert("บันทึกบุคลากรเรียบร้อย");
-    setName(""); setRole(""); setExt(""); setDepartment("");
+    setHn(""); setIncompleteLab(""); setWorkUnit(""); setAppointmentIssueDate(""); setAppointmentDate("");
   }
 
   return (
@@ -68,70 +69,62 @@ export default function StaffPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  ชื่อ-นามสกุล <span className="text-red-500">*</span>
+                  HN
                 </label>
                 <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="กรุณากรอกชื่อ-นามสกุล"
-                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  ตำแหน่ง <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                  required
-                >
-                  <option value="">เลือกตำแหน่ง</option>
-                  <option value="doctor">แพทย์</option>
-                  <option value="nurse">พยาบาล</option>
-                  <option value="admin">เจ้าหน้าที่</option>
-                  <option value="technician">นักเทคนิคการแพทย์</option>
-                  <option value="pharmacist">เภสัชกร</option>
-                  <option value="manager">ผู้จัดการ</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  เบอร์ต่อ
-                </label>
-                <input
-                  value={ext}
-                  onChange={(e) => setExt(e.target.value)}
-                  placeholder="กรุณากรอกเบอร์ต่อ (ถ้ามี)"
+                  value={hn}
+                  onChange={(e) => setHn(e.target.value)}
+                  placeholder="กรุณากรอก HN"
                   className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  แผนก <span className="text-red-500">*</span>
+                  Lab ที่ไม่ครบ
                 </label>
-                <select
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-                  required
-                >
-                  <option value="">เลือกแผนก</option>
-                  <option value="emergency">ฉุกเฉิน</option>
-                  <option value="surgery">ศัลยกรรม</option>
-                  <option value="internal">อายุรกรรม</option>
-                  <option value="pediatric">กุมารเวช</option>
-                  <option value="obstetrics">สูติ-นรีเวช</option>
-                  <option value="radiology">รังสีวิทยา</option>
-                  <option value="laboratory">ห้องปฏิบัติการ</option>
-                  <option value="pharmacy">เภสัชกรรม</option>
-                  <option value="administration">บริหาร</option>
-                </select>
+                <input
+                  value={incompleteLab}
+                  onChange={(e) => setIncompleteLab(e.target.value)}
+                  placeholder="กรุณากรอก Lab ที่ไม่ครบ"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  หน่วยงาน
+                </label>
+                <input
+                  value={workUnit}
+                  onChange={(e) => setWorkUnit(e.target.value)}
+                  placeholder="กรุณากรอกหน่วยงาน"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  วันที่ออกใบนัด
+                </label>
+                <input
+                  type="date"
+                  value={appointmentIssueDate}
+                  onChange={(e) => setAppointmentIssueDate(e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  วันนัด
+                </label>
+                <input
+                  type="date"
+                  value={appointmentDate}
+                  onChange={(e) => setAppointmentDate(e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                />
               </div>
             </div>
 
@@ -144,7 +137,7 @@ export default function StaffPage() {
               </button>
               <button
                 type="button"
-                onClick={() => { setName(""); setRole(""); setExt(""); setDepartment(""); }}
+                onClick={() => { setHn(""); setIncompleteLab(""); setWorkUnit(""); setAppointmentIssueDate(""); setAppointmentDate(""); }}
                 className="px-6 py-3 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
               >
                 ล้างข้อมูล

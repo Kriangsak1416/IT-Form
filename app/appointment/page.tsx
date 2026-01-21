@@ -23,6 +23,7 @@ export default function AppointmentPage() {
   const [details, setDetails] = useState("");
   const [purpose, setPurpose] = useState("");
   const [benefits, setBenefits] = useState("");
+  const [priority, setPriority] = useState("ปกติ");
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -95,10 +96,10 @@ export default function AppointmentPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const payload = { type: "appointment", subject, staffName, position, department, workGroup, officePhone, requestType, otherRequestDetails, details, purpose, benefits, sendApproval, attachedFiles: attachedFiles.map(f => f.name) };
+    const payload = { type: "appointment", subject, staffName, position, department, workGroup, officePhone, requestType, otherRequestDetails, details, purpose, benefits, priority, sendApproval, attachedFiles: attachedFiles.map(f => f.name) };
     console.log("Submit", payload);
     alert("บันทึกการนัดหมายเรียบร้อย");
-    setSubject(""); setStaffName(""); setPosition(""); setDepartment(""); setWorkGroup(""); setOfficePhone(""); setRequestType(""); setOtherRequestDetails(""); setDetails(""); setPurpose(""); setBenefits(""); setSendApproval(""); setShouldSearchApprover(false); setAttachedFiles([]); if (fileInputRef.current) fileInputRef.current.value = '';
+    setSubject(""); setStaffName(""); setPosition(""); setDepartment(""); setWorkGroup(""); setOfficePhone(""); setRequestType(""); setOtherRequestDetails(""); setDetails(""); setPurpose(""); setBenefits(""); setPriority("ปกติ"); setSendApproval(""); setShouldSearchApprover(false); setAttachedFiles([]); if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
   return (
@@ -261,81 +262,21 @@ export default function AppointmentPage() {
                   required
                 />
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                ส่งอนุมัติ <span className="text-red-500">*</span>
-              </label>
-              <div className="relative" ref={approverRef}>
-                <div className="pointer-events-none absolute -top-2 left-3 bg-white dark:bg-slate-800 px-1 text-[11px] font-medium text-indigo-600 dark:text-indigo-300">Search Box</div>
-                <div className="flex items-center gap-2 rounded-md border border-indigo-300 bg-white text-slate-900 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 dark:border-indigo-500/60 dark:bg-slate-800 dark:text-slate-100 transition-colors">
-                  <div className="pl-3 text-slate-400">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z" />
-                    </svg>
-                  </div>
-                  <input
-                    value={sendApproval}
-                    onChange={(e) => {
-                      setSendApproval(e.target.value);
-                      setShouldSearchApprover(true);
-                    }}
-                    onFocus={() => {
-                      setShouldSearchApprover(true);
-                      if (sendApproval.trim()) setIsApproverOpen(true);
-                    }}
-                    placeholder="ค้นหาชื่อหรือนามสกุล"
-                    className="flex-1 bg-transparent py-3 pr-3 text-sm placeholder-slate-500 outline-none"
-                    required
-                  />
-                  {sendApproval && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSendApproval("");
-                        setApproverResults([]);
-                        setApproverError(null);
-                        setIsApproverOpen(false);
-                        setShouldSearchApprover(false);
-                      }}
-                      className="pr-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                      aria-label="clear search"
-                    >
-                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M6 18L18 6" />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-                {isApproverOpen && (
-                  <div className="absolute z-20 mt-1 w-full rounded-md border border-slate-200 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700 max-h-60 overflow-y-auto">
-                    {approverLoading && (
-                      <div className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">กำลังค้นหา...</div>
-                    )}
-                    {approverError && (
-                      <div className="px-4 py-3 text-sm text-red-600">{approverError}</div>
-                    )}
-                    {!approverLoading && !approverError && approverResults.length === 0 && sendApproval.trim().length > 0 && (
-                      <div className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">ไม่พบข้อมูลผู้ส่งอนุมัติ</div>
-                    )}
-                    {approverResults.map((item) => (
-                      <button
-                        key={item.phos_wg_id}
-                        type="button"
-                        onClick={() => {
-                          setSendApproval(formatApproverName(item));
-                          setIsApproverOpen(false);
-                          setShouldSearchApprover(false);
-                        }}
-                        className="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
-                      >
-                        <div className="text-sm font-medium text-slate-900 dark:text-slate-100">{formatApproverName(item)}</div>
-                        <div className="text-xs text-slate-600 dark:text-slate-300">{item.phos_wg_name_position || '-'}{item.telephone ? ` • ${item.telephone}` : ''}</div>
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  ระดับความเร่งด่วน
+                </label>
+                <select
+                  value={priority}
+                  onChange={(e) => setPriority(e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                >
+                  <option value="">-- เลือกระดับความเร่งด่วน --</option>
+                  <option value="ด่วนมาก">ด่วนมาก</option>
+                  <option value="ด่วน">ด่วน</option>
+                  <option value="ปกติ">ปกติ</option>
+                </select>
               </div>
             </div>
 
@@ -438,6 +379,56 @@ export default function AppointmentPage() {
               </div>
             </div>
 
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                ส่งอนุมัติ <span className="text-red-500">*</span>
+              </label>
+              <div className="relative" ref={approverRef}>
+                <input
+                  value={sendApproval}
+                  onChange={(e) => {
+                    setSendApproval(e.target.value);
+                    setShouldSearchApprover(true);
+                  }}
+                  onFocus={() => {
+                    setShouldSearchApprover(true);
+                    if (sendApproval.trim()) setIsApproverOpen(true);
+                  }}
+                  placeholder="ค้นหาชื่อหรือนามสกุล"
+                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                  required
+                />
+                {isApproverOpen && (
+                  <div className="absolute z-20 mt-1 w-full rounded-md border border-slate-200 bg-white shadow-lg dark:border-slate-600 dark:bg-slate-700 max-h-60 overflow-y-auto">
+                    {approverLoading && (
+                      <div className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">กำลังค้นหา...</div>
+                    )}
+                    {approverError && (
+                      <div className="px-4 py-3 text-sm text-red-600">{approverError}</div>
+                    )}
+                    {!approverLoading && !approverError && approverResults.length === 0 && sendApproval.trim().length > 0 && (
+                      <div className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">ไม่พบข้อมูลผู้ส่งอนุมัติ</div>
+                    )}
+                    {approverResults.map((item) => (
+                      <button
+                        key={item.phos_wg_id}
+                        type="button"
+                        onClick={() => {
+                          setSendApproval(formatApproverName(item));
+                          setIsApproverOpen(false);
+                          setShouldSearchApprover(false);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
+                      >
+                        <div className="text-sm font-medium text-slate-900 dark:text-slate-100">{formatApproverName(item)}</div>
+                        <div className="text-xs text-slate-600 dark:text-slate-300">{item.phos_wg_name_position || '-'}{item.telephone ? ` • ${item.telephone}` : ''}</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="flex gap-4 pt-4">
               <button
                 type="submit"
@@ -447,7 +438,7 @@ export default function AppointmentPage() {
               </button>
               <button
                 type="button"
-                onClick={() => { setSubject(""); setStaffName(""); setPosition(""); setDepartment(""); setWorkGroup(""); setOfficePhone(""); setSendApproval(""); setShouldSearchApprover(false); setAttachedFiles([]); if (fileInputRef.current) fileInputRef.current.value = ''; }}
+                onClick={() => { setSubject(""); setStaffName(""); setPosition(""); setDepartment(""); setWorkGroup(""); setOfficePhone(""); setRequestType(""); setOtherRequestDetails(""); setDetails(""); setPurpose(""); setBenefits(""); setPriority("ปกติ"); setSendApproval(""); setShouldSearchApprover(false); setAttachedFiles([]); if (fileInputRef.current) fileInputRef.current.value = ''; }}
                 className="px-6 py-3 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
               >
                 ล้างข้อมูล
