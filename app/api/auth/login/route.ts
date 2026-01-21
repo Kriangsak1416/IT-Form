@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
     const connection = await pool.getConnection();
     const [rows] = await connection.query(
-      'SELECT phos_id as id, phos_username_pid, phos_password_year, phos_firstname, phos_lastname, position FROM phos_person WHERE phos_username_pid = ?',
+      'SELECT phos_id as id, phos_username_pid, phos_password_year, phos_firstname, phos_lastname, position, admin FROM phos_person WHERE phos_username_pid = ?',
       [username]
     );
     connection.release();
@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
         firstname: user.phos_firstname,
         lastname: user.phos_lastname,
         position: user.position,
+        isAdmin: user.admin === 'admin',
       },
     });
   } catch (error) {

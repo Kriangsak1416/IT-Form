@@ -1,10 +1,31 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user has logged in (user object in localStorage)
+    const userStr = localStorage.getItem("user");
+    const isLoggedInStatus = !!userStr;
+    setIsLoggedIn(isLoggedInStatus);
+    
+    // Check if user is admin from isAdmin field
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        setIsAdmin(user.isAdmin === true);
+      } catch (e) {
+        setIsAdmin(false);
+      }
+    }
+    setIsLoading(false);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
@@ -79,7 +100,7 @@ export default function Home() {
         <section className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
           <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-6">เลือกแบบฟอร์ม</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Link
               href="/patient"
               className="group bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border border-blue-200 dark:border-blue-700 rounded-xl p-6 hover:shadow-lg transition-all duration-200 hover:scale-105"
@@ -124,6 +145,50 @@ export default function Home() {
               </div>
               <p className="text-sm text-purple-700 dark:text-purple-300">รายงานความเสี่ยงในระบบ</p>
             </Link>
+
+            {isLoggedIn && (
+              <Link
+                href="/approval"
+                className="group bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 border border-orange-200 dark:border-orange-700 rounded-xl p-6 hover:shadow-lg transition-all duration-200 hover:scale-105"
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="h-12 w-12 bg-orange-500 rounded-lg flex items-center justify-center group-hover:bg-orange-600 transition-colors">
+                    <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-orange-900 dark:text-orange-100">อนุมัติแบบฟอร์ม</h3>
+                </div>
+                <p className="text-sm text-orange-700 dark:text-orange-300">ตรวจสอบและอนุมัติแบบฟอร์มที่ขอใช้บริการ</p>
+              </Link>
+            )}
+
+            {!isLoggedIn && (
+              <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-700/50 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-6 flex items-center justify-center min-h-[200px]">
+                <div className="text-center">
+                  <p className="text-sm text-slate-600 dark:text-slate-400">เข้าสู่ระบบเพื่อเข้าถึง</p>
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300">หน้าอนุมัติแบบฟอร์ม</p>
+                </div>
+              </div>
+            )}
+
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="group bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 border border-red-200 dark:border-red-700 rounded-xl p-6 hover:shadow-lg transition-all duration-200 hover:scale-105"
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="h-12 w-12 bg-red-500 rounded-lg flex items-center justify-center group-hover:bg-red-600 transition-colors">
+                    <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-red-900 dark:text-red-100">แผงควบคุม Admin</h3>
+                </div>
+                <p className="text-sm text-red-700 dark:text-red-300">จัดการข้อมูลและส่งออกรายงาน</p>
+              </Link>
+            )}
           </div>
         </section>
       </div>
