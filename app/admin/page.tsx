@@ -16,6 +16,16 @@ export default function AdminPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [editingUser, setEditingUser] = useState<any>(null);
   const [editFormData, setEditFormData] = useState<any>({});
+  const [newUser, setNewUser] = useState({
+    username: "",
+    password: "",
+    firstname: "",
+    lastname: "",
+    position: "",
+    admin: false,
+  });
+  const [creatingUser, setCreatingUser] = useState(false);
+  const [createError, setCreateError] = useState("");
 
   useEffect(() => {
     const userStr = localStorage.getItem("user");
@@ -98,6 +108,41 @@ export default function AdminPage() {
     } catch (error) {
       console.error("Error updating user:", error);
       alert("เกิดข้อผิดพลาดในการอัปเดต");
+    }
+  };
+
+  const handleCreateUser = async () => {
+    if (creatingUser) return;
+    setCreateError("");
+
+    if (!newUser.username || !newUser.password || !newUser.firstname || !newUser.lastname) {
+      setCreateError("กรุณากรอกข้อมูลให้ครบถ้วน");
+      return;
+    }
+
+    setCreatingUser(true);
+    try {
+      const res = await fetch("/api/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setCreateError(data.error || "สร้างผู้ใช้ไม่สำเร็จ");
+        return;
+      }
+
+      alert("สร้างผู้ใช้สำเร็จ");
+      setNewUser({ username: "", password: "", firstname: "", lastname: "", position: "", admin: false });
+      fetchUsers();
+    } catch (error) {
+      console.error("Error creating user:", error);
+      setCreateError("เกิดข้อผิดพลาดในการสร้างผู้ใช้");
+    } finally {
+      setCreatingUser(false);
     }
   };
 
@@ -274,9 +319,9 @@ export default function AdminPage() {
 
             {/* Content Section */}
             <section className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-          {/* Edit User Modal */}
-          {editingUser && (
-            <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4">
+              {/* Edit User Modal */}
+              {editingUser && (
+                <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center z-50 p-4">
               <div className="bg-white dark:bg-slate-800 rounded-xl shadow-lg max-w-md w-full p-6">
                 <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
                   แก้ไขสิทธิ์ผู้ใช้
@@ -330,191 +375,252 @@ export default function AdminPage() {
                 </div>
               </div>
             </div>
-          )}
-
-          {activeTab === "submissions" && (
-            </div>
-          </div>
-
-          {/* Controls */}
-          <div className="mb-6 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-700">
-            <div className="flex gap-3">
-              <button
-                onClick={handleExportCSV}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
-              >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                ส่งออก CSV
-              </button>
-              <button
-                onClick={handleExportJSON}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
-              >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                ส่งออก JSON
-              </button>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">แถวต่อหน้า:</label>
-              <select
-                value={rowsPerPage}
-                onChange={(e) => {
-                  setRowsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-                className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Table */}
-          <div className="overflow-x-auto">
-            {submissions.length === 0 ? (
-              <div className="text-center py-8 text-slate-600 dark:text-slate-400">
-                ไม่พบข้อมูล
-              </div>
-            ) : (
-              <>
-                <table className="w-full text-sm">
-                  <thead className="bg-slate-50 dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600">
-                    <tr>
-                      <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">#</th>
-                      <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">ประเภท</th>
-                      <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">หัวเรื่อง</th>
-                      <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">ผู้ส่ง</th>
-                      <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">หน่วยงาน</th>
-                      <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">ระดับความเร่งด่วน</th>
-                      <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">สถานะ</th>
-                      <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">วันที่ส่ง</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedData.map((sub, idx) => (
-                      <tr key={startIdx + idx} className="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                        <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{startIdx + idx + 1}</td>
-                        <td className="px-4 py-3 text-slate-900 dark:text-slate-100 font-medium">
-                          {sub.type === "appointment" ? "ขอใช้บริการ" : "รายงานความเสี่ยง"}
-                        </td>
-                        <td className="px-4 py-3 text-slate-900 dark:text-slate-100">{sub.subject || sub.hn || "-"}</td>
-                        <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{sub.staffName || sub.name || "-"}</td>
-                        <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{sub.department || sub.workUnit || "-"}</td>
-                        <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{sub.priority || "-"}</td>
-                        <td className="px-4 py-3">
-                          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                            sub.status === "approved" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" :
-                            sub.status === "rejected" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" :
-                            "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-                          }`}>
-                            {sub.status === "approved" ? "อนุมัติแล้ว" : sub.status === "rejected" ? "ปฏิเสธแล้ว" : "รอการอนุมัติ"}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
-                          {sub.submittedAt ? new Date(sub.submittedAt).toLocaleDateString("th-TH") : "-"}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                {/* Pagination */}
-                <div className="mt-6 flex items-center justify-between">
-                  <div className="text-sm text-slate-600 dark:text-slate-400">
-                    แสดง {startIdx + 1} ถึง {Math.min(startIdx + rowsPerPage, submissions.length)} จากทั้งหมด {submissions.length} รายการ
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      disabled={currentPage === 1}
-                      className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      ← ก่อนหน้า
-                    </button>
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                        <button
-                          key={page}
-                          onClick={() => setCurrentPage(page)}
-                          className={`px-3 py-2 rounded-lg transition-colors ${
-                            currentPage === page
-                              ? "bg-red-600 text-white"
-                              : "border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      ))}
-                    </div>
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      disabled={currentPage === totalPages}
-                      className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    >
-                      ถัดไป →
-                    </button>
-                  </div>
-                </div>
-              </>
             )}
-          )}
 
-          {activeTab === "users" && (
-            <div className="overflow-x-auto">
-              {users.length === 0 ? (
-                <div className="text-center py-8 text-slate-600 dark:text-slate-400">
-                  ไม่พบผู้ใช้
+            {activeTab === "submissions" && (
+              <div>
+                {/* Controls */}
+                <div className="mb-6 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between pb-6 border-b border-slate-200 dark:border-slate-700">
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleExportCSV}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+                    >
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      ส่งออก CSV
+                    </button>
+                    <button
+                      onClick={handleExportJSON}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors flex items-center gap-2"
+                    >
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      ส่งออก JSON
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">แถวต่อหน้า:</label>
+                    <select
+                      value={rowsPerPage}
+                      onChange={(e) => {
+                        setRowsPerPage(Number(e.target.value));
+                        setCurrentPage(1);
+                    }}
+                      className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    >
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
                 </div>
-              ) : (
-                <table className="w-full text-sm">
-                  <thead className="bg-slate-50 dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600">
-                    <tr>
-                      <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">ชื่อ</th>
-                      <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">ชื่อผู้ใช้</th>
-                      <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">Position</th>
-                      <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">Admin</th>
-                      <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">การดำเนินการ</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.map((user, idx) => (
-                      <tr key={user.id} className="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
-                        <td className="px-4 py-3 text-slate-900 dark:text-slate-100 font-medium">
-                          {user.firstname} {user.lastname}
-                        </td>
-                        <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{user.username}</td>
-                        <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{user.position || "-"}</td>
-                        <td className="px-4 py-3">
-                          <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                            user.admin === 'admin' ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
-                          }`}>
-                            {user.admin === 'admin' ? "ใช่" : "ไม่"}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
+
+                {/* Table */}
+                <div className="overflow-x-auto">
+                  {submissions.length === 0 ? (
+                    <div className="text-center py-8 text-slate-600 dark:text-slate-400">
+                    ไม่พบข้อมูล
+                  </div>
+                ) : (
+                    <>
+                      <table className="w-full text-sm">
+                        <thead className="bg-slate-50 dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600">
+                          <tr>
+                            <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">#</th>
+                            <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">ประเภท</th>
+                            <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">หัวเรื่อง</th>
+                            <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">ผู้ส่ง</th>
+                            <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">หน่วยงาน</th>
+                            <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">ระดับความเร่งด่วน</th>
+                            <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">สถานะ</th>
+                            <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">วันที่ส่ง</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {paginatedData.map((sub, idx) => (
+                            <tr key={startIdx + idx} className="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                              <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{startIdx + idx + 1}</td>
+                              <td className="px-4 py-3 text-slate-900 dark:text-slate-100 font-medium">
+                                {sub.type === "appointment" ? "ขอใช้บริการ" : "รายงานความเสี่ยง"}
+                              </td>
+                              <td className="px-4 py-3 text-slate-900 dark:text-slate-100">{sub.subject || sub.hn || "-"}</td>
+                              <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{sub.staffName || sub.name || "-"}</td>
+                              <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{sub.department || sub.workUnit || "-"}</td>
+                              <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{sub.priority || "-"}</td>
+                              <td className="px-4 py-3">
+                                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                                  sub.status === "approved" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" :
+                                  sub.status === "rejected" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" :
+                                  "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                                }`}>
+                                  {sub.status === "approved" ? "อนุมัติแล้ว" : sub.status === "rejected" ? "ปฏิเสธแล้ว" : "รอการอนุมัติ"}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                                {sub.submittedAt ? new Date(sub.submittedAt).toLocaleDateString("th-TH") : "-"}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+
+                      {/* Pagination */}
+                      <div className="mt-6 flex items-center justify-between">
+                        <div className="text-sm text-slate-600 dark:text-slate-400">
+                          แสดง {startIdx + 1} ถึง {Math.min(startIdx + rowsPerPage, submissions.length)} จากทั้งหมด {submissions.length} รายการ
+                        </div>
+                        <div className="flex gap-2">
                           <button
-                            onClick={() => handleEditUser(user)}
-                            className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors"
+                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                            disabled={currentPage === 1}
+                            className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                           >
-                            แก้ไข
+                            ← ก่อนหน้า
                           </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          )}
-        </section>
+                          <div className="flex items-center gap-1">
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                              <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`px-3 py-2 rounded-lg transition-colors ${
+                                  currentPage === page
+                                    ? "bg-red-600 text-white"
+                                    : "border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
+                                }`}
+                              >
+                                {page}
+                              </button>
+                            ))}
+                          </div>
+                          <button
+                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                            disabled={currentPage === totalPages}
+                            className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            ถัดไป →
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {activeTab === "users" && (
+              <div className="space-y-6">
+                <div className="bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600 rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">เพิ่มผู้ใช้ใหม่</h3>
+                    {createError && (
+                      <span className="text-sm text-red-500">{createError}</span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <input
+                      placeholder="ชื่อ"
+                      value={newUser.firstname}
+                      onChange={(e) => setNewUser({ ...newUser, firstname: e.target.value })}
+                      className="px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                    />
+                    <input
+                      placeholder="นามสกุล"
+                      value={newUser.lastname}
+                      onChange={(e) => setNewUser({ ...newUser, lastname: e.target.value })}
+                      className="px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                    />
+                    <input
+                      placeholder="ชื่อผู้ใช้"
+                      value={newUser.username}
+                      onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                      className="px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                    />
+                    <input
+                      placeholder="รหัสผ่าน"
+                      type="password"
+                      value={newUser.password}
+                      onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                      className="px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                    />
+                    <input
+                      placeholder="ตำแหน่ง"
+                      value={newUser.position}
+                      onChange={(e) => setNewUser({ ...newUser, position: e.target.value })}
+                      className="px-3 py-2 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+                    />
+                    <label className="inline-flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+                      <input
+                        type="checkbox"
+                        checked={newUser.admin}
+                        onChange={(e) => setNewUser({ ...newUser, admin: e.target.checked })}
+                        className="h-4 w-4 rounded border-slate-300"
+                      />
+                      ตั้งเป็น Admin
+                    </label>
+                  </div>
+                  <div className="mt-4 flex justify-end">
+                    <button
+                      onClick={handleCreateUser}
+                      disabled={creatingUser}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+                    >
+                      {creatingUser ? "กำลังบันทึก..." : "เพิ่มผู้ใช้"}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  {users.length === 0 ? (
+                    <div className="text-center py-8 text-slate-600 dark:text-slate-400">
+                      ไม่พบผู้ใช้
+                    </div>
+                  ) : (
+                    <table className="w-full text-sm">
+                      <thead className="bg-slate-50 dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600">
+                        <tr>
+                          <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">ชื่อ</th>
+                          <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">ชื่อผู้ใช้</th>
+                          <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">Position</th>
+                          <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">Admin</th>
+                          <th className="px-4 py-3 text-left font-medium text-slate-900 dark:text-slate-100">การดำเนินการ</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {users.map((user, idx) => (
+                          <tr key={user.id} className="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                            <td className="px-4 py-3 text-slate-900 dark:text-slate-100 font-medium">
+                              {user.firstname} {user.lastname}
+                            </td>
+                            <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{user.username}</td>
+                            <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{user.position || "-"}</td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                                user.admin === 'admin' ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
+                              }`}>
+                                {user.admin === 'admin' ? "ใช่" : "ไม่"}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <button
+                                onClick={() => handleEditUser(user)}
+                                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors"
+                              >
+                                แก้ไข
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              </div>
+            )}
+            </section>
           </div>
         </main>
       </div>

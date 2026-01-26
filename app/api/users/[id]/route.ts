@@ -5,6 +5,16 @@ export async function PUT(request: NextRequest) {
   try {
     const { userId, admin, position } = await request.json();
 
+    const adminRoleRaw = parseInt(process.env.ADMIN_ROLE_ID || '1', 10);
+    const adminRoleId = Number.isNaN(adminRoleRaw) ? 1 : adminRoleRaw;
+
+    if (admin === undefined && position === undefined) {
+      return NextResponse.json(
+        { error: 'No fields to update' },
+        { status: 400 }
+      );
+    }
+
     if (!userId) {
       return NextResponse.json(
         { error: 'User ID is required' },
@@ -13,36 +23,39 @@ export async function PUT(request: NextRequest) {
     }
 
     const connection = await pool.getConnection();
-    
-    // Build update query dynamically based on what's provided
-    const updates = [];
-    const values = [];
+    try {
+      await connection.beginTransaction();
 
-    if (admin !== undefined) {
-      updates.push('admin = ?');
-      values.push(admin ? 'admin' : null);
-    }
+      // Update position if provided
+      if (position !== undefined) {
+        await connection.query(
+          'UPDATE phos_person SET position = ? WHERE phos_id = ?',
+          [position, userId]
+        );
+      }
 
-    if (position !== undefined) {
-      updates.push('position = ?');
-      values.push(position);
-    }
+      // Sync admin role via user_roles table
+      if (admin !== undefined) {
+        if (admin) {
+          await connection.query(
+            'INSERT IGNORE INTO user_roles (user_id, role_id) VALUES (?, ?)',
+            [userId, adminRoleId]
+          );
+        } else {
+          await connection.query(
+            'DELETE FROM user_roles WHERE user_id = ? AND role_id = ?',
+            [userId, adminRoleId]
+          );
+        }
+      }
 
-    if (updates.length === 0) {
+      await connection.commit();
+    } catch (err) {
+      await connection.rollback();
+      throw err;
+    } finally {
       connection.release();
-      return NextResponse.json(
-        { error: 'No fields to update' },
-        { status: 400 }
-      );
     }
-
-    values.push(userId);
-
-    const query = `UPDATE phos_person SET ${updates.join(', ')} WHERE phos_id = ?`;
-    
-    const [result] = await connection.query(query, values);
-    
-    connection.release();
 
     return NextResponse.json({
       success: true,
