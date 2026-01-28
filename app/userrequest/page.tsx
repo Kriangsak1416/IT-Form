@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function AppointmentPage() {
+export default function UserRequestPage() {
   const [subject, setSubject] = useState("");
   const [staffName, setStaffName] = useState("");
   const [position, setPosition] = useState("");
@@ -96,9 +96,9 @@ export default function AppointmentPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const payload = { type: "appointment", subject, staffName, position, department, workGroup, officePhone, requestType, otherRequestDetails, details, purpose, benefits, priority, sendApproval, attachedFiles: attachedFiles.map(f => f.name) };
+    const payload = { type: "userrequest", subject, staffName, position, department, workGroup, officePhone, requestType, otherRequestDetails, details, purpose, benefits, priority, sendApproval, attachedFiles: attachedFiles.map(f => f.name) };
     console.log("Submit", payload);
-    alert("บันทึกการนัดหมายเรียบร้อย");
+    alert("บันทึกคำขอใช้บริการเรียบร้อย");
     setSubject(""); setStaffName(""); setPosition(""); setDepartment(""); setWorkGroup(""); setOfficePhone(""); setRequestType(""); setOtherRequestDetails(""); setDetails(""); setPurpose(""); setBenefits(""); setPriority("ปกติ"); setSendApproval(""); setShouldSearchApprover(false); setAttachedFiles([]); if (fileInputRef.current) fileInputRef.current.value = '';
   }
 

@@ -161,7 +161,7 @@ export default function AdminPage() {
     
     // Create CSV rows
     const rows = submissions.map(sub => [
-      sub.type === "appointment" ? "ขอใช้บริการ" : "รายงานความเสี่ยง",
+      sub.type === "userrequest" ? "ขอใช้บริการ" : sub.type === "userregistration" ? "ลงทะเบียนผู้ใช้งาน" : "รายงานความเสี่ยง",
       sub.subject || sub.hn || "-",
       sub.staffName || sub.name || "-",
       sub.department || sub.workUnit || "-",
@@ -445,7 +445,7 @@ export default function AdminPage() {
                             <tr key={startIdx + idx} className="border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
                               <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{startIdx + idx + 1}</td>
                               <td className="px-4 py-3 text-slate-900 dark:text-slate-100 font-medium">
-                                {sub.type === "appointment" ? "ขอใช้บริการ" : "รายงานความเสี่ยง"}
+                                {sub.type === "userrequest" ? "ขอใช้บริการ" : sub.type === "userregistration" ? "ลงทะเบียนผู้ใช้งาน" : "รายงานความเสี่ยง"}
                               </td>
                               <td className="px-4 py-3 text-slate-900 dark:text-slate-100">{sub.subject || sub.hn || "-"}</td>
                               <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{sub.staffName || sub.name || "-"}</td>

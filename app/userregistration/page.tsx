@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function PatientPage() {
+export default function UserRegistrationPage() {
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
   const [idCard, setIdCard] = useState("");
@@ -124,7 +124,7 @@ export default function PatientPage() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const payload = { type: "patient", name, dob, idCard, department, workGroup, mobilePhone, officePhone, programs: selectedPrograms, registrationStatus, sendApproval, attachedFiles: attachedFiles.map(f => f.name), acceptTerms };
+    const payload = { type: "userregistration", name, dob, startDate, idCard, department, workGroup, mobilePhone, officePhone, programs: selectedPrograms, registrationStatus, sendApproval, attachedFiles: attachedFiles.map(f => f.name), acceptTerms };
     console.log("Submit", payload);
     alert("ส่งข้อมูลผู้ป่วยเรียบร้อย");
     setName("");

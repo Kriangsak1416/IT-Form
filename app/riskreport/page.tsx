@@ -1,22 +1,89 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function StaffPage() {
+// Helper functions สำหรับแปลงวันที่ระหว่าง ค.ศ. และ พ.ศ.
+function convertCEtoBE(dateString: string): string {
+  if (!dateString) return "";
+  const [year, month, day] = dateString.split("-");
+  const beYear = parseInt(year) + 543;
+  return `${beYear}-${month}-${day}`;
+}
+
+function convertBEtoCE(dateString: string): string {
+  if (!dateString) return "";
+  const [year, month, day] = dateString.split("-");
+  const ceYear = parseInt(year) - 543;
+  return `${ceYear}-${month}-${day}`;
+}
+
+export default function RiskReportPage() {
   const [hn, setHn] = useState("");
   const [incompleteLab, setIncompleteLab] = useState("");
   const [workUnit, setWorkUnit] = useState("");
   const [appointmentIssueDate, setAppointmentIssueDate] = useState("");
   const [appointmentDate, setAppointmentDate] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
 
-  function handleSubmit(e: React.FormEvent) {
+  useEffect(() => {
+    // Get user_id from localStorage or cookie
+    const userJson = localStorage.getItem("user");
+    if (userJson) {
+      const user = JSON.parse(userJson);
+      setUserId(user.id);
+    }
+  }, []);
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const payload = { type: "staff", hn, incompleteLab, workUnit, appointmentIssueDate, appointmentDate };
-    console.log("Submit", payload);
-    alert("บันทึกบุคลากรเรียบร้อย");
-    setHn(""); setIncompleteLab(""); setWorkUnit(""); setAppointmentIssueDate(""); setAppointmentDate("");
+    setIsSubmitting(true);
+
+    try {
+      // Send dates as YYYY-MM-DD format (DATE type, not DATETIME)
+      const payload = {
+        hn: hn || null,
+        labname: incompleteLab || null,
+        unit_name: workUnit || null,
+        appointment_issue_date: appointmentIssueDate || null,
+        appointment_date: appointmentDate || null,
+        user_report: userId || null,
+      };
+
+      console.log("📤 Sending payload:", payload);
+
+      const response = await fetch("/api/forms/riskreport", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      console.log("📥 Response status:", response.status);
+
+      const result = await response.json();
+      console.log("📥 Response data:", result);
+
+      if (result.success) {
+        alert("บันทึกรายงานความเสี่ยงเรียบร้อย");
+        // Reset form
+        setHn("");
+        setIncompleteLab("");
+        setWorkUnit("");
+        setAppointmentIssueDate("");
+        setAppointmentDate("");
+      } else {
+        alert(`เกิดข้อผิดพลาด: ${result.error}`);
+      }
+    } catch (error: any) {
+      console.error("❌ Error submitting form:", error);
+      alert("ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -131,14 +198,16 @@ export default function StaffPage() {
             <div className="flex gap-4 pt-4">
               <button
                 type="submit"
-                className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                disabled={isSubmitting}
+                className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                บันทึกข้อมูล
+                {isSubmitting ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
               </button>
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={() => { setHn(""); setIncompleteLab(""); setWorkUnit(""); setAppointmentIssueDate(""); setAppointmentDate(""); }}
-                className="px-6 py-3 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors focus:ring-2 focus:ring-slate-500 focus:ring-offset-2"
+                className="px-6 py-3 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 ล้างข้อมูล
               </button>

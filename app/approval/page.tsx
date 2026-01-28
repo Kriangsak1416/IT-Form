@@ -144,7 +144,7 @@ export default function ApprovalPage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div>
                       <p className="text-xs text-slate-500 dark:text-slate-400">ประเภท</p>
-                      <p className="font-medium text-slate-900 dark:text-slate-100">{submission.type === "appointment" ? "ขอใช้บริการ" : "รายงานความเสี่ยง"}</p>
+                      <p className="font-medium text-slate-900 dark:text-slate-100">{submission.type === "userrequest" ? "ขอใช้บริการ" : submission.type === "userregistration" ? "ลงทะเบียนผู้ใช้งาน" : "รายงานความเสี่ยง"}</p>
                     </div>
                     <div>
                       <p className="text-xs text-slate-500 dark:text-slate-400">หัวเรื่อง</p>
